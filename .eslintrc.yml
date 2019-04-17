@@ -11,6 +11,7 @@ rules:
   linebreak-style: 0
   react/forbid-prop-types: 'off'
   react/jsx-filename-extension: 'off'
+  react/prop-types: 'off'
 
 env:
   browser: true
