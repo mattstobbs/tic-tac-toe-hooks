@@ -6,9 +6,11 @@ rules:
   function-paren-newline: 'off'
   import/extensions: 'off'
   import/no-unresolved: 'off'
+  import/prefer-default-export: 'off'
   indent: ["error", 2]
   jsx-a11y/label-has-for: 'off'
   linebreak-style: 0
+  no-plusplus: 'off'
   react/forbid-prop-types: 'off'
   react/jsx-filename-extension: 'off'
   react/prop-types: 'off'
