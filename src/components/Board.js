@@ -2,9 +2,7 @@ import React from 'react';
 import Square from './Square';
 
 const Board = () => {
-  const renderSquare = (i) => {
-    return <Square />;
-  };
+  const renderSquare = i => <Square value={i} />;
 
   const status = 'Next player: X';
 

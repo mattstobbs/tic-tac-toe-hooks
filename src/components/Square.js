@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Square = () => (
+const Square = ({ value }) => (
   <button className="square">
-    {/* TODO */}
+    {value}
   </button>
 );
 
