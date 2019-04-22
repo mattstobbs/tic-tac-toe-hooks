@@ -1,13 +1,40 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import Board from './Board';
 import { calculateWinner } from '../utils/calculateWinner';
 
-const Game = () => {
-  const [history, setHistory] = useState([{
+const initialState = {
+  history: [{
     squares: Array(9).fill(null),
-  }]);
-  const [stepNumber, setStepNumber] = useState(0);
-  const [xIsNext, setXIsNext] = useState(true);
+  }],
+  stepNumber: 0,
+  xIsNext: true,
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+  case 'make_move':
+    return {
+      ...state,
+      // replace history with calculation (e.g. new current board state?)
+      history: action.newHistory,
+      stepNumber: state.stepNumber + 1,
+      xIsNext: !state.xIsNext,
+    };
+  case 'jump_to':
+    return {
+      ...state,
+      stepNumber: action.step,
+      xIsNext: (action.step % 2) === 0,
+    };
+  default:
+    throw new Error();
+  }
+};
+
+const Game = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const { history, stepNumber, xIsNext } = state;
 
   const currentBoard = history[stepNumber];
   const winner = calculateWinner(currentBoard.squares);
@@ -19,14 +46,11 @@ const Game = () => {
       return;
     }
     newSquares[i] = xIsNext ? 'X' : 'O';
-    setHistory([...newHistory, { squares: newSquares }]);
-    setStepNumber(newHistory.length);
-    setXIsNext(!xIsNext);
+    dispatch({ type: 'make_move', newHistory: [...newHistory, { squares: newSquares }] });
   };
 
   const jumpTo = (step) => {
-    setStepNumber(step);
-    setXIsNext((step % 2) === 0);
+    dispatch({ type: 'jump_to', step });
   };
 
   const moves = history.map((step, move) => {
