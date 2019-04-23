@@ -1,6 +1,7 @@
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import Board from './Board';
 import { calculateWinner } from '../utils/calculateWinner';
+import { fetchSavedHistory } from '../api';
 
 const initialState = {
   history: [{
@@ -25,6 +26,13 @@ const reducer = (state, action) => {
       stepNumber: action.step,
       xIsNext: (action.step % 2) === 0,
     };
+  case 'load_game':
+    return {
+      ...state,
+      history: action.savedHistory,
+      stepNumber: action.savedHistory.length - 1,
+      xIsNext: ((action.savedHistory.length - 1) % 2) === 0,
+    };
   default:
     throw new Error();
   }
@@ -37,6 +45,10 @@ const Game = () => {
 
   const currentBoard = history[stepNumber];
   const winner = calculateWinner(currentBoard.squares);
+
+  useEffect(() => {
+    fetchSavedHistory().then(savedHistory => dispatch({ type: 'load_game', savedHistory }));
+  }, []);
 
   const handleClick = (i) => {
     const newSquares = [...currentBoard.squares];
