@@ -15,8 +15,7 @@ const reducer = (state, action) => {
   case 'make_move':
     return {
       ...state,
-      // replace history with calculation (e.g. new current board state?)
-      history: action.newHistory,
+      history: [...state.history.slice(0, state.stepNumber + 1), action.newBoardState],
       stepNumber: state.stepNumber + 1,
       xIsNext: !state.xIsNext,
     };
@@ -40,13 +39,12 @@ const Game = () => {
   const winner = calculateWinner(currentBoard.squares);
 
   const handleClick = (i) => {
-    const newHistory = history.slice(0, stepNumber + 1);
     const newSquares = [...currentBoard.squares];
     if (winner || newSquares[i]) {
       return;
     }
     newSquares[i] = xIsNext ? 'X' : 'O';
-    dispatch({ type: 'make_move', newHistory: [...newHistory, { squares: newSquares }] });
+    dispatch({ type: 'make_move', newBoardState: { squares: newSquares } });
   };
 
   const jumpTo = (step) => {
