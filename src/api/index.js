@@ -9,4 +9,4 @@ const savedHistory = [
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 export const fetchSavedHistory = () =>
-  delay(2000).then(() => savedHistory);
+  delay(500).then(() => savedHistory);
