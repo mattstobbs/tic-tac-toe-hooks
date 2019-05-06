@@ -1,32 +1,66 @@
-import React, { useState } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import Board from './Board';
 import { calculateWinner } from '../utils/calculateWinner';
+import { fetchSavedHistory } from '../api';
+
+const initialState = {
+  history: [{
+    squares: Array(9).fill(null),
+  }],
+  stepNumber: 0,
+  xIsNext: true,
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+  case 'make_move':
+    return {
+      ...state,
+      history: [...state.history.slice(0, state.stepNumber + 1), action.newBoardState],
+      stepNumber: state.stepNumber + 1,
+      xIsNext: !state.xIsNext,
+    };
+  case 'jump_to':
+    return {
+      ...state,
+      stepNumber: action.step,
+      xIsNext: (action.step % 2) === 0,
+    };
+  case 'load_game':
+    return {
+      ...state,
+      history: action.savedHistory,
+      stepNumber: action.savedHistory.length - 1,
+      xIsNext: ((action.savedHistory.length - 1) % 2) === 0,
+    };
+  default:
+    throw new Error();
+  }
+};
 
 const Game = () => {
-  const [history, setHistory] = useState([{
-    squares: Array(9).fill(null),
-  }]);
-  const [stepNumber, setStepNumber] = useState(0);
-  const [xIsNext, setXIsNext] = useState(true);
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const { history, stepNumber, xIsNext } = state;
 
   const currentBoard = history[stepNumber];
   const winner = calculateWinner(currentBoard.squares);
 
+  useEffect(() => {
+    fetchSavedHistory().then(savedHistory => dispatch({ type: 'load_game', savedHistory }));
+  }, []);
+
   const handleClick = (i) => {
-    const newHistory = history.slice(0, stepNumber + 1);
     const newSquares = [...currentBoard.squares];
     if (winner || newSquares[i]) {
       return;
     }
     newSquares[i] = xIsNext ? 'X' : 'O';
-    setHistory([...newHistory, { squares: newSquares }]);
-    setStepNumber(newHistory.length);
-    setXIsNext(!xIsNext);
+    dispatch({ type: 'make_move', newBoardState: { squares: newSquares } });
   };
 
   const jumpTo = (step) => {
-    setStepNumber(step);
-    setXIsNext((step % 2) === 0);
+    dispatch({ type: 'jump_to', step });
   };
 
   const moves = history.map((step, move) => {
